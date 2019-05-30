@@ -1,0 +1,144 @@
+/* Read input from STDIN. Print your output to STDOUT*/
+#include <iostream>
+#include <vector>
+#include<bits/stdc++.h>
+#include<algorithm>
+
+using namespace std;
+
+vector<int> get_place(int number);
+int get_num(vector<int> set);
+
+int main(int argc, char *a[])
+{
+	int num_tests = 0;
+    cin >> num_tests;
+	vector<vector<int>> test_set;
+	
+
+	for(int i=0; i<num_tests; i++)
+    {
+		int num_boxes;
+		cin >> num_boxes;
+		vector<int> input_set;
+		for(int j=0; j<num_boxes; j++)
+		{
+			int number;
+			cin >> number;
+			input_set.push_back(number);
+
+		}
+		sort(input_set.begin(),input_set.end(),std::greater<int>());
+		test_set.push_back(input_set);
+	}
+
+	for(int i=0; i<num_tests; i++)
+    {
+		vector<vector<int>> num_set;
+		vector<int> input_set = test_set[i];
+		
+		for(int j=0; j<input_set.size(); j++)
+		{
+			vector<int> num_seg = get_place(input_set[j]);
+			num_set.push_back(num_seg);
+		}
+
+		vector<int> sum_set;
+		vector<int> match_set;
+
+        for(int iter = 0; iter <=1; iter++)
+        {
+            if(iter == 1)
+            {
+                num_set.clear();
+                reverse(input_set.begin(),input_set.end());
+                for(int j=0; j<input_set.size(); j++)
+		        {
+			        vector<int> num_seg = get_place(input_set[j]);
+			        num_set.push_back(num_seg);
+		        }
+            
+            }
+            
+    		for(int j=0; j<num_set.size(); j++)
+    		{
+    			int sum_start = get_num(num_set[j]);
+    			//cout << "---------base---" << sum_start << endl; 
+    			
+    		    for(int m = j+1; m < num_set.size(); m++)
+    		    {   
+    				int sum = sum_start;
+        			match_set = num_set[j];
+        
+        			vector<int> num = num_set[j];
+        			
+        			for(int k=m; k<num_set.size();k++)
+        			{
+        				vector<int> num1 = num_set[k];
+        				bool match = false;
+        				//cout << "matching with ";
+        				
+        				for(int l=0; l<num1.size(); l++)
+        				{
+        				    //cout << num1[l];
+        						std::vector<int>::iterator it; 
+        						it = find(match_set.begin(), match_set.end(), num1[l]);
+        						if(it != match_set.end())
+        						{
+        							match = true;
+        							break;
+        							
+        						}	
+        				}
+        				//cout << endl;
+        				if(match == false)
+        				{
+        				    //cout << "NO match,can add" << endl;
+        					sum += get_num(num_set[k]);
+        					for(int l=0; l<num1.size(); l++)
+        					{
+        						match_set.push_back(num1[l]);
+        					}
+        					
+        				}
+    
+        			
+        			}
+        			//cout << "------ adding sum to list ---" << sum << endl;
+        			sum_set.push_back(sum);
+    		    }
+    			
+    		}
+        }
+
+		std::vector<int>::iterator result;
+		result = std::max_element(sum_set.begin(),sum_set.end());
+		cout << *result << endl;
+	}
+}
+
+vector<int> get_place(int number)
+{
+	vector<int> num_seg;
+	while(number != 0)
+	{
+		int rem = number%10;
+		number = number/10;
+		num_seg.push_back(rem);
+	}
+	reverse(num_seg.begin(),num_seg.end());
+	return num_seg;
+}
+
+int get_num(vector<int> set)
+{
+	int place = 1;
+	int num = 0;
+	for (int i = set.size() -1; i>=0; i--)
+	{
+		num = num + (set[i] * place); 
+		place = place * 10;
+	}
+	return num;
+
+}
